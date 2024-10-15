@@ -32,3 +32,13 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+task stage(type: Copy) {
+	dependsOn bootJar
+	from bootJar.archiveFile
+	into "$buildDir/libs"
+}
+
+build {
+	dependsOn stage
+}
