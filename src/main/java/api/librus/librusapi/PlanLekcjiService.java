@@ -21,16 +21,22 @@ public class PlanLekcjiService {
 
         Thread.sleep(2000);
 
-        // Pobierz dane z tabeli planu lekcji
+        // Pobierz dane z tabeli planu lekcji z aktualnego tygodnia
         List<WebElement> rows = driver.findElements(By.xpath("//table[@class='planLekcji']/tbody/tr"));
         for (WebElement row : rows) {
             List<WebElement> cells = row.findElements(By.tagName("td"));
-            if (cells.size() > 0) {
+            if (!cells.isEmpty()) {
                 Map<String, String> lekcja = new HashMap<>();
                 lekcja.put("godzina", cells.get(0).getText());
                 lekcja.put("przedmiot", cells.get(1).getText());
                 lekcja.put("nauczyciel", cells.get(2).getText());
-                lekcja.put("sala", cells.get(3).getText());
+                // Sprawdzanie czy lekcja jest odwołana
+                if (row.getAttribute("class").contains("cancelled")) {
+                    lekcja.put("status", "odwołana");
+                } else {
+                    lekcja.put("status", "normalna");
+                }
+
                 planLekcji.add(lekcja);
             }
         }
