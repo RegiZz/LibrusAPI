@@ -15,7 +15,7 @@ public class LibrusLoginService {
     // Metoda logująca użytkownika do systemu Librus
     public WebDriver login(String username, String password) throws InterruptedException {
         // Ustawienia dla Selenium WebDriver
-        System.setProperty("webdriver.chrome.driver", "/home/chromedriver-linux64/chromedriver");
+        System.setProperty("webdriver.chrome.driver", "/usr/local/bin/chromedriver");
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless");
 
