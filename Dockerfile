@@ -11,5 +11,4 @@ ENV CHROME_DRIVER=/usr/bin/chromedriver
 COPY . /app
 WORKDIR /app
 
-# Run your Java API
 CMD ["./gradlew", "bootRun"]
