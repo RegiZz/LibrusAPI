@@ -1,0 +1,17 @@
+[resources]
+cpu = "shared-cpu-2x"
+memory = 4096
+
+[[services]]
+internal_port = 8080
+protocol = "tcp"
+
+[checks]
+    [checks.http]
+        port = "8080"
+        interval = "10s"
+        timeout = "30s"
+        grace_period = "120s"
+        method = "GET"
+        path = "/api/health"
+
