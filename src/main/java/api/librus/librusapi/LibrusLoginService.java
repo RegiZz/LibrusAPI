@@ -9,37 +9,41 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class LibrusLoginService {
-
-    private WebDriver driver;
-
+    WebDriver driver = null;
     // Metoda logująca użytkownika do systemu Librus
     public WebDriver login(String username, String password) throws InterruptedException {
-        // Ustawienia dla Selenium WebDriver
-        System.setProperty("webdriver.chrome.driver", "/usr/bin/chromedriver");
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless");
-        options.addArguments("--no-sandbox"); // Bypass OS security model
-        options.addArguments("--disable-dev-shm-usage"); // Overcome limited resource problems
-        options.addArguments("--remote-debugging-port=9222"); // Enable remote debugging
-        options.setBinary("/usr/bin/chromium-browser");
 
-        driver = new ChromeDriver(options);
+        try {
+            // Ustawienia dla Selenium WebDriver
+            System.setProperty("webdriver.chrome.driver", "/usr/bin/chromedriver");
+            ChromeOptions options = new ChromeOptions();
+            options.addArguments("--headless");
+            options.addArguments("--no-sandbox"); // Bypass OS security model
+            options.addArguments("--disable-dev-shm-usage"); // Overcome limited resource problems
 
-        driver.get("https://portal.librus.pl/rodzina/login");
+            driver = new ChromeDriver(options);
+            System.out.println("WebDriver został zainicjalizowany");
 
-        // Logowanie
-        WebElement loginField = driver.findElement(By.name("login"));
-        WebElement passwordField = driver.findElement(By.name("password"));
-        loginField.sendKeys(username);
-        passwordField.sendKeys(password);
+            driver.get("https://portal.librus.pl/rodzina/login");
+            System.out.println("Zaladowano strone logowania");
 
-        WebElement loginButton = driver.findElement(By.xpath("//button[@type='submit']"));
-        loginButton.click();
+            // Logowanie
+            WebElement loginField = driver.findElement(By.name("login"));
+            WebElement passwordField = driver.findElement(By.name("password"));
+            loginField.sendKeys(username);
+            passwordField.sendKeys(password);
 
-        // Czekaj na zalogowanie
-        Thread.sleep(2000);
+            WebElement loginButton = driver.findElement(By.xpath("//button[@type='submit']"));
+            loginButton.click();
 
-        return driver; // Zwracamy WebDriver, który będzie używany w dalszej części aplikacji
+            // Czekaj na zalogowanie
+            Thread.sleep(2000);
+
+            return driver; // Zwracamy WebDriver, który będzie używany w dalszej części aplikacji
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public void quit() {
