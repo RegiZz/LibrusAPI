@@ -1,5 +1,6 @@
 package api.librus.librusapi;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -9,10 +10,10 @@ import org.springframework.http.ResponseEntity;
 
 @Service
 public class LibrusTimetableService {
-    private final String apiUrl = "https://api.librus.pl"; // Zaktualizuj URL, jeśli to konieczne
+    private final String apiUrl = "https://api.librus.pl";
     private final String token;
 
-    public LibrusTimetableService(String token) {
+    public LibrusTimetableService(@Value("token") String token) {
         this.token = token;
     }
 
