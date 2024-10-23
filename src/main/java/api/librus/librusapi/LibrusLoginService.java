@@ -22,10 +22,9 @@ public class LibrusLoginService {
                     .asString();
 
             if (loginResponse.getStatus() == 200) {
-                // Przyjmujemy, że token jest w nagłówku odpowiedzi
                 this.token = loginResponse.getHeaders().getFirst("Authorization");
                 activateApiAccess();
-                return this.token; // Zwracamy token
+                return this.token;
             } else {
                 throw new RuntimeException("Błąd logowania: " + loginResponse.getStatus());
             }
