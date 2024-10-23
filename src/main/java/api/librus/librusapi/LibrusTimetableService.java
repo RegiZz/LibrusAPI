@@ -1,38 +1,72 @@
 package api.librus.librusapi;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
+
+import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.http.ResponseEntity;
+import kong.unirest.HttpResponse;
+import kong.unirest.Unirest;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 
 @Service
 public class LibrusTimetableService {
-    private final String apiUrl = "https://api.librus.pl";
-    private final String token;
+    public Map<String, Object> getTimetable(LocalDate from, LocalDate to, String token) {
+        // Tworzenie formularza danych (POST)
+        Map<String, Object> formData = new HashMap<>();
+        formData.put("tydzien", from.toString() + "_" + to.toString());
 
-    public LibrusTimetableService(@Value("token") String token) {
-        this.token = token;
-    }
+        // Wysłanie żądania POST do API Librusa
+        HttpResponse<String> response = Unirest.post("https://api.librus.pl/przegladaj_plan_lekcji")
+                .header("Authorization", "Bearer " + token)
+                .fields(formData)
+                .asString();
 
-    public Object getTimetables() {
-        try {
-            RestTemplate restTemplate = new RestTemplate();
-            String url = apiUrl + "/Timetables";
+        // Parsowanie odpowiedzi HTML
+        Document document = Jsoup.parse(response.getBody());
+        Elements rows = document.select("table.decorated.plan-lekcji tr:nth-child(odd)");
 
-            // Dodaj token do nagłówków
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", "Bearer " + token);
-            HttpEntity<String> entity = new HttpEntity<>(headers);
 
-            ResponseEntity<Object> response = restTemplate.exchange(url, HttpMethod.GET, entity, Object.class);
+        Map<String, Object> timetable = new HashMap<>();
+        String[] days = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
 
-            return response.getBody();
-        } catch (Exception e) {
-            System.out.println("[LibrusAPI: Timetables] Szkoła nie obsługuje tej funkcji");
-            throw e;
+
+        List<String> hours = new ArrayList<>();
+
+
+        Map<String, List<String>> lessonsByDay = new HashMap<>();
+        for (String day : days) {
+            lessonsByDay.put(day, new ArrayList<>());
         }
+
+        // Iterowanie po wierszach tabeli
+        for (Element row : rows) {
+            String hour = row.select("th").text();
+            hours.add(hour);
+
+            Elements cells = row.select("td:not(:first-child):not(:last-child)");
+            for (int i = 0; i < cells.size(); i++) {
+                Element cell = cells.get(i);
+                String lessonText = cell.select(".text").text().trim();
+
+                if (!lessonText.isEmpty()) {
+                    lessonsByDay.get(days[i]).add(lessonText);
+                } else {
+                    lessonsByDay.get(days[i]).add("No lesson");
+                }
+            }
+        }
+
+        timetable.put("hours", hours);
+        timetable.put("lessons", lessonsByDay);
+
+        return timetable;
     }
+
 }

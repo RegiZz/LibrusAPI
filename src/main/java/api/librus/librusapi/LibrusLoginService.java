@@ -14,7 +14,6 @@ public class LibrusLoginService {
         String loginUrl = apiUrl + "/OAuth/Authorization?client_id=46&response_type=code&scope=mydata";
 
         try {
-            // Wysyłanie żądania logowania
             HttpResponse<String> loginResponse = Unirest.post(loginUrl)
                     .field("action", "login")
                     .field("login", username)
