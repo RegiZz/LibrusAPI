@@ -1,9 +1,10 @@
 package api.librus.librusapi;
 
-import api.librus.librusapi.LibrusTimetableService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/librus")
@@ -19,7 +20,9 @@ public class LibrusController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestParam String login, @RequestParam String password) {
+    public ResponseEntity<String> login(@RequestParam String login,
+                                        @RequestParam String password) {
+
         String token = librusLoginService.login(login, password);
         if (token != null) {
             return ResponseEntity.ok(token);
@@ -29,13 +32,16 @@ public class LibrusController {
     }
 
     @GetMapping("/timetables")
-    public ResponseEntity<Object> getTimetables(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<Object> getTimetables(@RequestHeader("Authorization") String token,
+                                                @RequestParam("from") String from,
+                                                @RequestParam("to") String to) {
         try {
-            LibrusTimetableService timetableService = new LibrusTimetableService(token);
-            Object timetables = timetableService.getTimetables();
+            LocalDate startDate = LocalDate.parse(from);
+            LocalDate endDate = LocalDate.parse(to);
+            Object timetables = librusTimetableService.getTimetable(startDate, endDate, token);
             return ResponseEntity.ok(timetables);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("Wystąpił błąd podczas pobierania planu lekcji");
+            return ResponseEntity.status(500).body("Wystąpił błąd podczas pobierania planu lekcji: " + e.getMessage());
         }
     }
 }
