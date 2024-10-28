@@ -12,11 +12,13 @@ public class LibrusController {
 
     private final LibrusLoginService librusLoginService;
     private final LibrusTimetableService librusTimetableService;
+    private final LibrusGradesService librusGradesService;
 
     @Autowired
-    public LibrusController(LibrusLoginService librusLoginService, LibrusTimetableService librusTimetableService) {
+    public LibrusController(LibrusLoginService librusLoginService, LibrusTimetableService librusTimetableService, LibrusGradesService librusGradesService) {
         this.librusLoginService = librusLoginService;
         this.librusTimetableService = librusTimetableService;
+        this.librusGradesService = librusGradesService;
     }
 
     @PostMapping("/login")
@@ -42,6 +44,16 @@ public class LibrusController {
             return ResponseEntity.ok(timetables);
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Wystąpił błąd podczas pobierania planu lekcji: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/grades")
+    public ResponseEntity<Object> getGrades(@RequestHeader("Authorization") String token) {
+        try{
+            Object grades = librusGradesService.getGrades(token);
+            return ResponseEntity.ok(grades);
+        } catch (Exception e){
+            return ResponseEntity.status(500).body("Wystąpił błąd podczas pobierania ocen: " + e.getMessage());
         }
     }
 }
