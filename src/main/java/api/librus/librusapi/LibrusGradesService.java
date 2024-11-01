@@ -77,4 +77,32 @@ public class LibrusGradesService {
 
         return semesterInfo;
     }
+
+    public double getAverage(String token) {
+        List<Map<String, Object>> gradesList = getGrades(token);
+        double totalSum = 0.0;
+        int gradeCount = 0;
+
+        for (Map<String, Object> subject : gradesList) {
+            Double subjectAverage = (Double) subject.get("average");
+            if (subjectAverage != null && subjectAverage > 0) {
+                totalSum += subjectAverage;
+                gradeCount++;
+            }
+        }
+
+        return gradeCount > 0 ? totalSum / gradeCount : 0.0;
+    }
+
+    public double getAverage(String token, String subjectName) {
+        List<Map<String, Object>> gradesList = getGrades(token);
+        for (Map<String, Object> subject : gradesList) {
+            String name = (String) subject.get("name");
+            Double subjectAverage = (Double) subject.get("average");
+            if (name != null && name.equalsIgnoreCase(subjectName) && subjectAverage != null) {
+                return subjectAverage;
+            }
+        }
+        return 0.0;
+    }
 }

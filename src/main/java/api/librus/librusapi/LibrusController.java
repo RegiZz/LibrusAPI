@@ -56,4 +56,28 @@ public class LibrusController {
             return ResponseEntity.status(500).body("Wystąpił błąd podczas pobierania ocen: " + e.getMessage());
         }
     }
+
+    @GetMapping("/grades/getAverage/allSubjects")
+    public ResponseEntity<Object> getAverageGrades(@RequestHeader("Authorization") String token) {
+        try{
+            Object  averageGradesAll = librusGradesService.getAverage(token);
+            return ResponseEntity.ok(averageGradesAll);
+        }
+        catch (Exception e){
+            return ResponseEntity.status(500).body("Nie udalo sie pobrac sredniej: " + e.getMessage());
+        }
+
+    }
+
+    @GetMapping("/grades/getAverage/specificSubject")
+    public ResponseEntity<Object> getAverageGradesSpecificSubject(@RequestHeader("Authorization") String token,
+                                                                  @RequestParam("subject") String subject) {
+        try{
+            Object averageGradesSpecific = librusGradesService.getAverage(token, subject);
+            return ResponseEntity.ok(averageGradesSpecific);
+        }
+        catch (Exception e){
+            return ResponseEntity.status(500).body("Nie udalo sie pobrac sredniej dla podanego przedmiotu: " + e.getMessage());
+        }
+    }
 }
