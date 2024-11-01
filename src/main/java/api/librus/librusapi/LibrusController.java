@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/librus")
@@ -13,12 +14,17 @@ public class LibrusController {
     private final LibrusLoginService librusLoginService;
     private final LibrusTimetableService librusTimetableService;
     private final LibrusGradesService librusGradesService;
+    private final LibrusAbsenceService librusAbsenceService;
 
     @Autowired
-    public LibrusController(LibrusLoginService librusLoginService, LibrusTimetableService librusTimetableService, LibrusGradesService librusGradesService) {
+    public LibrusController(LibrusLoginService librusLoginService,
+                            LibrusTimetableService librusTimetableService,
+                            LibrusGradesService librusGradesService,
+                            LibrusAbsenceService librusAbsenceService) {
         this.librusLoginService = librusLoginService;
         this.librusTimetableService = librusTimetableService;
         this.librusGradesService = librusGradesService;
+        this.librusAbsenceService = librusAbsenceService;
     }
 
     @PostMapping("/login")
@@ -78,6 +84,27 @@ public class LibrusController {
         }
         catch (Exception e){
             return ResponseEntity.status(500).body("Nie udalo sie pobrac sredniej dla podanego przedmiotu: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/absences/{id}")
+    public ResponseEntity<Map<String, Object>> getAbsenceById(@PathVariable String id,
+                                                              @RequestHeader("Authorization") String token) {
+        try {
+            Map<String, Object> absenceData = librusAbsenceService.getAbsencesForSubject(token, id);
+            return ResponseEntity.ok(absenceData);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("error", "Wystąpił błąd podczas pobierania danych o nieobecności"));
+        }
+    }
+
+    @GetMapping("/absences")
+    public ResponseEntity<Map<String, Object>> getAllAbsences(@RequestHeader("Authorization") String token) {
+        try {
+            Map<String, Object> allAbsences = librusAbsenceService.getAbsences(token);
+            return ResponseEntity.ok(allAbsences);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("error", "Wystąpił błąd podczas pobierania listy nieobecności"));
         }
     }
 }
