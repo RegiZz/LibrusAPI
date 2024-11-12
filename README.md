@@ -1,6 +1,22 @@
 
 # LibrusApi
 
+## Docs
+
+
+url/login -> params: login, password
+
+url/timetables -> params: token, from(date), to(date)
+
+url/grades -> params: token
+
+url/grades/getAverage/allSubjects -> params: token
+
+url/grades/getAverage/specificSubject -> params: token, subject(string)
+
+url/absences/{id} -> params: token, id(in url)
+
+url/absences -> params: token
 
 
 ## Usage/Examples
